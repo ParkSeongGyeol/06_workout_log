@@ -12,6 +12,12 @@ async function loadStats(start = "", end = "") {
   renderRecentRecords(data.recent_records);
   renderMonthlySummary(data.monthly_summary);
   renderTotalDuration(data.total_duration);
+
+  renderExtraCharts(
+    data.monthly_summary,
+    data.exercise_counts,
+    data.exercise_labels
+  );
 }
 
 function renderWorkoutChart(labels, data) {
@@ -148,6 +154,66 @@ document.getElementById("filter-btn").addEventListener("click", () => {
     loadStats(start, end);
   }
 });
+
+let repsChart, ratioChart;
+
+function renderExtraCharts(monthlyData, exerciseCounts, exerciseLabels) {
+  const ctx1 = document.getElementById("monthlyRepsChart").getContext("2d");
+  const ctx2 = document.getElementById("exerciseRatioChart").getContext("2d");
+
+  // 월별 반복 수 변화 (막대그래프)
+  const months = monthlyData.map((d) => d.month);
+  const reps = monthlyData.map((d) => d.total_reps);
+
+  if (repsChart) repsChart.destroy();
+  repsChart = new Chart(ctx1, {
+    type: "bar",
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: "Total Reps per Month",
+          data: reps,
+          backgroundColor: "#3498db",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true },
+      },
+    },
+  });
+
+  // 운동 비율 (파이차트)
+  if (ratioChart) ratioChart.destroy();
+  ratioChart = new Chart(ctx2, {
+    type: "pie",
+    data: {
+      labels: exerciseLabels,
+      datasets: [
+        {
+          data: exerciseCounts,
+          backgroundColor: [
+            "#1abc9c",
+            "#e74c3c",
+            "#9b59b6",
+            "#f1c40f",
+            "#2ecc71",
+          ],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: "bottom" },
+      },
+    },
+  });
+}
 
 // 초기 로딩
 loadStats();

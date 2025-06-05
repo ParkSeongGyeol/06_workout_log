@@ -114,3 +114,12 @@ td {
 th {
   background-color: #f0f4f8;
 }
+
+.charts {
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+canvas {
+  max-width: 100%;
+  height: 300px;
+}
