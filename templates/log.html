@@ -2,13 +2,13 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>Log Workout</title>
+    <title>Log</title>
     <link rel="stylesheet" href="/static/style.css" />
-    <script src="/static/main.js" defer></script>
+    <script src="/static/manage.js" defer></script>
   </head>
   <body>
     <header class="header">
-      <h1>🏋️‍♂️ Log</h1>
+      <h1>📃 Log</h1>
       <nav>
         <a href="/">Home</a>
         <a href="/log">Log</a>
@@ -17,50 +17,9 @@
     </header>
 
     <main class="container">
-      <!-- 입력 카드 -->
-      <section class="card">
-        <form id="exercise-form">
-          <div class="form-group">
-            <label>Workout Type</label>
-            <select name="exercise" id="exercise-select" required>
-              <option value="">Select Workout</option>
-              <option value="푸시업">푸시업</option>
-              <option value="스쿼트">스쿼트</option>
-              <option value="플랭크">플랭크</option>
-              <option value="런지">런지</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Date & Time</label>
-            <input
-              type="datetime-local"
-              name="datetime"
-              id="datetime"
-              required
-            />
-          </div>
-
-          <div id="dynamic-inputs"></div>
-
-          <div class="form-group">
-            <label>Notes</label>
-            <textarea
-              name="note"
-              placeholder="Add notes about your workout"
-            ></textarea>
-          </div>
-
-          <button type="submit" class="submit-btn">Log Workout</button>
-        </form>
-      </section>
-
-      <!-- 기록 테이블 -->
       <section class="records">
-        <h2>Recent Workouts</h2>
-        <div id="recent-records">
-          <!-- JS로 테이블 생성 -->
-        </div>
+        <h2>All Records</h2>
+        <div id="record-table"></div>
       </section>
     </main>
   </body>

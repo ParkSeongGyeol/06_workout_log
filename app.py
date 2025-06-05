@@ -33,6 +33,14 @@ def get_recent_records():
     recent = sorted(records, key=lambda x: x.get("datetime", ""), reverse=True)[:20]
     return jsonify(recent)
 
+@app.route("/all-records")
+def all_records():
+    if not os.path.exists(DATA_PATH):
+        return jsonify([])
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        records = json.load(f)
+    return jsonify([{**r, "index": i} for i, r in enumerate(records)])
+
 @app.route("/stats-data")
 def stats_data():
     # 1. 날짜 필터링 파라미터 받아오기
@@ -174,6 +182,58 @@ def save():
         records = json.load(f)
 
     records.append(new_record)
+
+    with open(DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(records, f, ensure_ascii=False, indent=2)
+
+    return jsonify({"status": "success"})
+
+
+@app.route("/update-record", methods=["POST"])
+def update_record():
+    data = request.get_json()
+    index = data.get("index")
+    if index is None:
+        return jsonify({"error": "index required"}), 400
+
+    if not os.path.exists(DATA_PATH):
+        return jsonify({"error": "no data"}), 400
+
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        records = json.load(f)
+
+    if index < 0 or index >= len(records):
+        return jsonify({"error": "invalid index"}), 400
+
+    record = records[index]
+    for key, value in data.items():
+        if key != "index" and value is not None:
+            record[key] = value
+    records[index] = record
+
+    with open(DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(records, f, ensure_ascii=False, indent=2)
+
+    return jsonify({"status": "success"})
+
+
+@app.route("/delete-record", methods=["POST"])
+def delete_record():
+    data = request.get_json()
+    index = data.get("index")
+    if index is None:
+        return jsonify({"error": "index required"}), 400
+
+    if not os.path.exists(DATA_PATH):
+        return jsonify({"error": "no data"}), 400
+
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        records = json.load(f)
+
+    if index < 0 or index >= len(records):
+        return jsonify({"error": "invalid index"}), 400
+
+    records.pop(index)
 
     with open(DATA_PATH, "w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
