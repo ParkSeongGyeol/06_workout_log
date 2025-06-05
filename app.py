@@ -33,60 +33,92 @@ def stats():
 
 @app.route("/stats-data")
 def stats_data():
-    with open(DATA_PATH, "r", encoding="utf-8") as f:
+    # 1. 날짜 필터링 파라미터 받아오기
+    start_date_str = request.args.get("start")
+    end_date_str = request.args.get("end")
+
+    # 2. 날짜 파싱
+    if start_date_str and end_date_str:
+        try:
+            start_dt = datetime.fromisoformat(start_date_str)
+            end_dt = datetime.fromisoformat(end_date_str) + timedelta(days=1)  # inclusive
+        except ValueError:
+            return jsonify({"error": "Invalid date format"}), 400
+    else:
+        # 날짜 없으면 최근 30일로 기본 설정
+        end_dt = datetime.today() + timedelta(days=1)
+        start_dt = end_dt - timedelta(days=30)
+        
+    # 3. 파일 불러오기
+    with open("data/records.json", "r", encoding="utf-8") as f:
         records = json.load(f)
 
-    records.sort(key=lambda r: r["datetime"], reverse=True)
-    today = datetime.today()
-    cutoff_30days = today - timedelta(days=30)
+    # 4. 필터링된 레코드만 추출
+    filtered = []
+    for r in records:
+        try:
+            dt = datetime.fromisoformat(r["datetime"])
+        except Exception:
+            continue
+        if start_dt <= dt < end_dt:
+            r["_datetime_obj"] = dt  # 임시 보관
+            filtered.append(r)
+    
+    # 5. 분석 데이터 생성
+    filtered.sort(key=lambda x: x["_datetime_obj"], reverse=True)
+    recent_records = [{k: v for k, v in r.items() if k != "_datetime_obj"} for r in filtered[:20]]
 
     total_duration = 0
     exercise_counter = Counter()
-    monthly_summary = defaultdict(lambda: {"푸시업": 0, "스쿼트": 0, "total_reps": 0, "intensity": 0, "calories": 0})
-    recent_records = records[:20]
     weekly_data = defaultdict(int)
+    monthly_summary = defaultdict(lambda: {"푸시업": 0, "스쿼트": 0, "total_reps": 0, "intensity": 0, "calories": 0})
 
-    for r in records:
-        dt = datetime.fromisoformat(r["datetime"])
-        ym = dt.strftime("%Y-%m")
+    today = datetime.today()
+
+    for r in filtered:
+        dt = r["_datetime_obj"]
         exercise = r.get("exercise", "")
         reps = r.get("reps", 0)
         duration = r.get("duration", 0)
 
+        # 칼로리 계산
         if exercise == "푸시업":
-            calories = reps * 0.4
+            cal = reps * 0.4
         elif exercise == "스쿼트":
-            calories = reps * 0.5
+            cal = reps * 0.5
         else:
-            calories = 0
+            cal = 0
 
+        ym = dt.strftime("%Y-%m")
         monthly_summary[ym][exercise] += reps
         monthly_summary[ym]["total_reps"] += reps
-        monthly_summary[ym]["calories"] += calories
         monthly_summary[ym]["intensity"] += reps
+        monthly_summary[ym]["calories"] += cal
 
+        # duration 누적
         if duration:
             total_duration += duration
         elif exercise in ["푸시업", "스쿼트"]:
             total_duration += reps * 2
 
-        if dt >= cutoff_30days:
-            week_label = f"Week {((today - dt).days) // 7 + 1}"
-            weekly_data[week_label] += reps * 2
+        # 주차 그룹
+        week_label = f"Week {((today - dt).days) // 7 + 1}"
+        weekly_data[week_label] += reps * 2
 
+        # 종류 누적
         exercise_counter[exercise] += 1
 
-    sorted_week_labels = sorted(weekly_data.keys(), key=lambda w: int(w.split()[1]))
-    weekly_durations = [weekly_data[w] for w in sorted_week_labels]
+    sorted_weeks = sorted(weekly_data.keys(), key=lambda x: int(x.split()[1]))
+    weekly_durations = [weekly_data[w] for w in sorted_weeks]
 
+    # 월별 요약 변환
     monthly_summary_list = [
-        {"month": k, **v}
-        for k, v in sorted(monthly_summary.items())
+        {"month": k, **v} for k, v in sorted(monthly_summary.items())
     ]
 
     return jsonify({
         "total_duration": total_duration,
-        "week_labels": sorted_week_labels,
+        "week_labels": sorted_weeks,
         "weekly_durations": weekly_durations,
         "exercise_labels": list(exercise_counter.keys()),
         "exercise_counts": list(exercise_counter.values()),
