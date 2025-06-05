@@ -10,24 +10,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 운동 종류별 입력 필드 렌더링
   exerciseSelect.addEventListener("change", () => {
-    const exercise = exerciseSelect.value;
-    dynamicInputs.innerHTML = ""; // 초기화
+    const selected = exerciseSelect.value;
+    dynamicInputs.innerHTML = "";
 
-    if (["푸시업", "스쿼트", "풀업", "런지"].includes(exercise)) {
-      dynamicInputs.innerHTML += `<label>반복 수: <input type="number" name="reps" required></label><br>`;
+    if (selected === "푸시업" || selected === "스쿼트" || selected === "런지") {
+      dynamicInputs.innerHTML += `
+        <div class="form-group">
+          <label>Reps</label>
+          <input type="number" name="reps" required />
+        </div>`;
     }
 
-    if (exercise === "런지") {
-      dynamicInputs.innerHTML += `<label>방향: 
-        <select name="direction">
-          <option value="양쪽">양쪽</option>
-          <option value="왼쪽">왼쪽</option>
-          <option value="오른쪽">오른쪽</option>
-        </select></label><br>`;
+    if (selected === "플랭크") {
+      dynamicInputs.innerHTML += `
+        <div class="form-group">
+          <label>Duration (seconds)</label>
+          <input type="number" name="duration" required />
+        </div>`;
     }
 
-    if (exercise === "플랭크") {
-      dynamicInputs.innerHTML += `<label>시간(초): <input type="number" name="duration" required></label><br>`;
+    if (selected === "런지") {
+      dynamicInputs.innerHTML += `
+        <div class="form-group">
+          <label>Direction</label>
+          <select name="direction">
+            <option value="양쪽">양쪽</option>
+            <option value="왼쪽">왼쪽</option>
+            <option value="오른쪽">오른쪽</option>
+          </select>
+        </div>`;
     }
   });
 
