@@ -91,6 +91,12 @@ function renderRecentRecords(records) {
   table.innerHTML = html;
 }
 
+function getIntensityLevel(intensity) {
+  if (intensity < 100) return { level: "Low", color: "green" };
+  if (intensity < 200) return { level: "Moderate", color: "orange" };
+  return { level: "High", color: "red" };
+}
+
 function renderMonthlySummary(summary) {
   const table = document.getElementById("monthly-table");
   if (!summary || summary.length === 0) {
@@ -106,35 +112,32 @@ function renderMonthlySummary(summary) {
           <th>Push-ups</th>
           <th>Squats</th>
           <th>Total Reps</th>
-          <th>Intensity</th>
+          <th>Intensity Level</th>
           <th>Calories Burned</th>
         </tr>
       </thead>
       <tbody>
         ${summary
-          .map(
-            (row) => `
-          <tr>
-            <td>${row.month}</td>
-            <td>${row["푸시업"] || 0}</td>
-            <td>${row["스쿼트"] || 0}</td>
-            <td>${row.total_reps}</td>
-            <td>${row.intensity}</td>
-            <td>${row.calories.toFixed(1)}</td>
-          </tr>
-        `
-          )
+          .map((row) => {
+            const intensityInfo = getIntensityLevel(row.intensity);
+            return `
+            <tr>
+              <td>${row.month}</td>
+              <td>${row["푸시업"] || 0}</td>
+              <td>${row["스쿼트"] || 0}</td>
+              <td>${row.total_reps}</td>
+              <td style="color: ${intensityInfo.color}; font-weight: bold;">
+                ${intensityInfo.level}
+              </td>
+              <td>${row.calories.toFixed(1)}</td>
+            </tr>
+          `;
+          })
           .join("")}
       </tbody>
     </table>
   `;
   table.innerHTML = html;
-}
-
-function renderTotalDuration(total) {
-  const minutes = (total / 60).toFixed(1);
-  const box = document.getElementById("total-duration-box");
-  box.innerText = `Total Workout Time: ${minutes} minutes`;
 }
 
 // 날짜 필터 버튼 이벤트

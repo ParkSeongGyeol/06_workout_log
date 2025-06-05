@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import json
-import os
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
+import csv
+from io import StringIO, BytesIO
+import os
 
 app = Flask(__name__)
 
@@ -120,6 +122,32 @@ def stats_data():
         "recent_records": recent_records,
         "monthly_summary": monthly_summary_list
     })
+
+@app.route("/export-csv")
+def export_csv():
+    with open("data/records.json", "r", encoding="utf-8") as f:
+        records = json.load(f)
+
+    # CSV로 변환
+    if not records:
+        return "No data", 400
+
+    # CSV 헤더 추출 (모든 키 통합)
+    all_keys = set()
+    for r in records:
+        all_keys.update(r.keys())
+    headers = sorted(all_keys)
+
+    output = StringIO()
+    writer = csv.DictWriter(output, fieldnames=headers)
+    writer.writeheader()
+    writer.writerows(records)
+
+    mem = BytesIO()
+    mem.write(output.getvalue().encode("utf-8-sig"))  # Excel 호환용 BOM 추가
+    mem.seek(0)
+
+    return send_file(mem, mimetype="text/csv", as_attachment=True, download_name="records.csv")
 
 @app.route("/save", methods=["POST"])
 def save():
