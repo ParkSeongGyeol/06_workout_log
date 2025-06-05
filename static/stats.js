@@ -12,6 +12,7 @@ async function loadStats(start = "", end = "") {
   renderRecentRecords(data.recent_records);
   renderMonthlySummary(data.monthly_summary);
   renderTotalDuration(data.total_duration);
+  renderTotalCount(data.total_count);
 
   renderExtraCharts(
     data.monthly_summary,
@@ -95,6 +96,18 @@ function renderRecentRecords(records) {
     </table>
   `;
   table.innerHTML = html;
+}
+
+function renderTotalDuration(seconds) {
+  const el = document.getElementById("total-duration");
+  if (!el) return;
+  el.textContent = (seconds / 60).toFixed(1);
+}
+
+function renderTotalCount(count) {
+  const el = document.getElementById("total-count");
+  if (!el) return;
+  el.textContent = count;
 }
 
 function getIntensityLevel(intensity) {

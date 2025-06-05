@@ -8,11 +8,16 @@ import os
 
 app = Flask(__name__)
 
-DATA_PATH = "data/records.json"
+DATA_DIR = "data"
+DATA_PATH = os.path.join(DATA_DIR, "records.json")
 
 @app.route("/")
 def home():
-    return render_template("input.html")
+    return render_template("home.html")
+
+@app.route("/log")
+def log_page():
+    return render_template("log.html")
 
 @app.route("/stats")
 def stats():
@@ -27,6 +32,14 @@ def get_recent_records():
     # 최신순으로 20개
     recent = sorted(records, key=lambda x: x.get("datetime", ""), reverse=True)[:20]
     return jsonify(recent)
+
+@app.route("/all-records")
+def all_records():
+    if not os.path.exists(DATA_PATH):
+        return jsonify([])
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        records = json.load(f)
+    return jsonify([{**r, "index": i} for i, r in enumerate(records)])
 
 @app.route("/stats-data")
 def stats_data():
@@ -108,6 +121,8 @@ def stats_data():
     sorted_weeks = sorted(weekly_data.keys(), key=lambda x: int(x.split()[1]))
     weekly_durations = [weekly_data[w] for w in sorted_weeks]
 
+    total_count = sum(exercise_counter.values())
+
     # 월별 요약 변환
     monthly_summary_list = [
         {"month": k, **v} for k, v in sorted(monthly_summary.items())
@@ -115,6 +130,7 @@ def stats_data():
 
     return jsonify({
         "total_duration": total_duration,
+        "total_count": total_count,
         "week_labels": sorted_weeks,
         "weekly_durations": weekly_durations,
         "exercise_labels": list(exercise_counter.keys()),
@@ -125,7 +141,10 @@ def stats_data():
 
 @app.route("/export-csv")
 def export_csv():
-    with open("data/records.json", "r", encoding="utf-8") as f:
+    if not os.path.exists(DATA_PATH):
+        return "No data", 400
+
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
         records = json.load(f)
 
     # CSV로 변환
@@ -152,6 +171,9 @@ def export_csv():
 @app.route("/save", methods=["POST"])
 def save():
     new_record = request.get_json()
+
+    os.makedirs(DATA_DIR, exist_ok=True)
+
     if not os.path.exists(DATA_PATH):
         with open(DATA_PATH, "w", encoding="utf-8") as f:
             json.dump([], f)
@@ -160,6 +182,58 @@ def save():
         records = json.load(f)
 
     records.append(new_record)
+
+    with open(DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(records, f, ensure_ascii=False, indent=2)
+
+    return jsonify({"status": "success"})
+
+
+@app.route("/update-record", methods=["POST"])
+def update_record():
+    data = request.get_json()
+    index = data.get("index")
+    if index is None:
+        return jsonify({"error": "index required"}), 400
+
+    if not os.path.exists(DATA_PATH):
+        return jsonify({"error": "no data"}), 400
+
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        records = json.load(f)
+
+    if index < 0 or index >= len(records):
+        return jsonify({"error": "invalid index"}), 400
+
+    record = records[index]
+    for key, value in data.items():
+        if key != "index" and value is not None:
+            record[key] = value
+    records[index] = record
+
+    with open(DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(records, f, ensure_ascii=False, indent=2)
+
+    return jsonify({"status": "success"})
+
+
+@app.route("/delete-record", methods=["POST"])
+def delete_record():
+    data = request.get_json()
+    index = data.get("index")
+    if index is None:
+        return jsonify({"error": "index required"}), 400
+
+    if not os.path.exists(DATA_PATH):
+        return jsonify({"error": "no data"}), 400
+
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        records = json.load(f)
+
+    if index < 0 or index >= len(records):
+        return jsonify({"error": "invalid index"}), 400
+
+    records.pop(index)
 
     with open(DATA_PATH, "w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
