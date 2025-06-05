@@ -22,7 +22,9 @@ async function loadStats(start = "", end = "") {
 }
 
 function renderWorkoutChart(labels, data) {
-  const ctx = document.getElementById("workoutChart").getContext("2d");
+  const canvas = document.getElementById("lineChart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
   if (window.workoutChart) window.workoutChart.destroy();
   window.workoutChart = new Chart(ctx, {
     type: "line",
@@ -43,7 +45,9 @@ function renderWorkoutChart(labels, data) {
 }
 
 function renderExerciseChart(labels, data) {
-  const ctx = document.getElementById("exerciseChart").getContext("2d");
+  const canvas = document.getElementById("barChart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
   if (window.exerciseChart) window.exerciseChart.destroy();
   window.exerciseChart = new Chart(ctx, {
     type: "bar",
@@ -74,8 +78,9 @@ function renderRecentRecords(records) {
           <th>Date</th>
           <th>Exercise</th>
           <th>Reps</th>
-          <th>Weight</th>
-          <th>Notes</th>
+          <th>Duration</th>
+          <th>Direction</th>
+          <th>Note</th>
         </tr>
       </thead>
       <tbody>
@@ -86,8 +91,9 @@ function renderRecentRecords(records) {
             <td>${r.datetime || "-"}</td>
             <td>${r.exercise || "-"}</td>
             <td>${r.reps || "-"}</td>
-            <td>${r.weight || "-"}</td>
-            <td>${r.notes || ""}</td>
+            <td>${r.duration || "-"}</td>
+            <td>${r.direction || "-"}</td>
+            <td>${r.note || ""}</td>
           </tr>
         `
           )
