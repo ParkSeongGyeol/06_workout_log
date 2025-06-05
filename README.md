@@ -38,21 +38,19 @@
 
 ```
 
-project/
-├── app.py # Flask 백엔드 서버
-├── data/
-│ └── records.json # 운동 기록 저장 파일
-├── static/
-│ ├── style.css # 전역 스타일시트
-│ ├── log.js # 기록 페이지 JS
-│ ├── stats.js # 통계 페이지 JS
-│ └── Chart.min.js # Chart.js 라이브러리
-├── templates/
-│ ├── index.html # 홈 페이지
-│ ├── log.html # 기록 입력 페이지
-│ └── stats.html # 시각화/통계 페이지
-└── README.md # 프로젝트 설명 파일
-
+workout_logger/  
+├── app.py # Flask 메인 앱  
+├── templates/  
+│ ├── home.html # 대시보드 홈
+│ ├── log.html  # 운동 입력 및 기록 확인 페이지
+│ └── stats.html # 시각화 페이지
+├── static/  
+│ ├── main.js # 입력 페이지 JS  
+│ ├── stats.js # 시각화 페이지 JS  
+│ └── style.css # 공통 스타일  
+├── data/  
+│ └── records.json # 운동 기록 저장 파일 (Git 제외 대상)  
+└── .gitignore # 불필요 파일 제외
 ```
 
 ---

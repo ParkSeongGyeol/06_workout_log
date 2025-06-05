@@ -13,7 +13,11 @@ DATA_PATH = os.path.join(DATA_DIR, "records.json")
 
 @app.route("/")
 def home():
-    return render_template("input.html")
+    return render_template("home.html")
+
+@app.route("/log")
+def log_page():
+    return render_template("log.html")
 
 @app.route("/stats")
 def stats():
