@@ -81,6 +81,17 @@ textarea {
   background-color: #234bcc;
 }
 
+.filter-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.filter-box .export-section {
+  margin-left: auto;
+}
+
 .records {
   background-color: white;
   padding: 1.5rem;
@@ -110,6 +121,16 @@ textarea {
   .card-grid {
     grid-template-columns: 1fr;
   }
+  .filter-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .filter-box .export-section {
+    margin-left: 0;
+  }
+  .charts canvas {
+    max-width: 100%;
+  }
 }
 
 table {
@@ -133,9 +154,11 @@ th {
   margin-top: 2rem;
   padding-bottom: 2rem;
 }
-canvas {
-  max-width: 100%;
+.charts canvas {
+  max-width: 600px;
   height: 300px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .button-link {
