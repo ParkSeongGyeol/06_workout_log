@@ -131,6 +131,32 @@ textarea {
   .charts canvas {
     max-width: 100%;
   }
+  .summary-card {
+    padding: 1rem;
+  }
+
+  .records,
+  .monthly-summary {
+    padding: 1rem;
+  }
+
+  #lineChart,
+  #barChart,
+  #monthlyRepsChart,
+  #exerciseRatioChart {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .charts {
+    padding: 1rem 0;
+  }
+
+  #record-table,
+  #monthly-table {
+    overflow-x: auto;
+    display: block;
+  }
 }
 
 table {
@@ -172,4 +198,34 @@ th {
 
 .button-link:hover {
   background-color: #234bcc;
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .header nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+
+  .records,
+  .card {
+    padding: 1rem;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 0.95rem;
+  }
 }

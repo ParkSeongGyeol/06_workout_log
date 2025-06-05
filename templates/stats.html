@@ -3,7 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <title>운동 통계</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/style.css" />
+    <style>
+      @media (max-width: 768px) {
+        .card-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .records > div,
+        .monthly-summary > div {
+          overflow-x: auto;
+        }
+        table {
+          font-size: 0.85rem;
+          min-width: 600px;
+        }
+        .submit-btn {
+          width: 100%;
+        }
+        canvas {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+        }
+        .header nav {
+          width: 100%;
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+        }
+      }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/stats.js" defer></script>
     <script src="/static/log.js" defer></script>
@@ -31,7 +65,9 @@
         </label>
         <button id="filter-btn" class="submit-btn">Apply Filter</button>
         <section class="export-section">
-          <button id="export-csv-btn" class="submit-btn">📤 CSV 다운로드</button>
+          <button id="export-csv-btn" class="submit-btn">
+            📤 CSV 다운로드
+          </button>
         </section>
       </section>
 
