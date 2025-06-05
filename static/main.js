@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 현재 시간 기본 설정
-  const dt = new Date();
-  const iso = dt.toISOString().slice(0, 16);
-  document.getElementById("datetime").value = iso;
+  // 현재 시간을 KST 기준으로 설정
+  const now = new Date();
+  const offsetMs = now.getTimezoneOffset() * 60000;
+  const kstNow = new Date(now.getTime() - offsetMs);
+  const isoLocal = kstNow.toISOString().slice(0, 16);
+  document.getElementById("datetime").value = isoLocal;
 
   const exerciseSelect = document.getElementById("exercise-select");
   const dynamicInputs = document.getElementById("dynamic-inputs");
@@ -51,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let data = {
       datetime: datetime,
-      exercise: exercise
+      exercise: exercise,
     };
 
     // 운동별 입력값 설정
@@ -73,12 +75,20 @@ document.addEventListener("DOMContentLoaded", () => {
     await fetch("/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     alert("운동 기록이 저장되었습니다.");
     form.reset();
-    document.getElementById("datetime").value = (new Date()).toISOString().slice(0, 16);
+
+    // 다시 현재 KST로 기본값 설정
+    const resetNow = new Date();
+    const resetKST = new Date(
+      resetNow.getTime() - resetNow.getTimezoneOffset() * 60000
+    );
+    document.getElementById("datetime").value = resetKST
+      .toISOString()
+      .slice(0, 16);
     dynamicInputs.innerHTML = "";
     fetchRecentRecords();
   });
@@ -89,13 +99,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const records = await res.json();
 
     const container = document.getElementById("recent-records");
-    container.innerHTML = "<ul>" + records.map(r => {
-      let detail = `${r.exercise} - `;
-      if (r.reps) detail += `${r.reps}회 `;
-      if (r.duration) detail += `${r.duration}초 `;
-      if (r.direction) detail += `(${r.direction}) `;
-      return `<li>${r.datetime} | ${detail}</li>`;
-    }).join("") + "</ul>";
+    container.innerHTML =
+      "<ul>" +
+      records
+        .map((r) => {
+          let detail = `${r.exercise} - `;
+          if (r.reps) detail += `${r.reps}회 `;
+          if (r.duration) detail += `${r.duration}초 `;
+          if (r.direction) detail += `(${r.direction}) `;
+          return `<li>${r.datetime} | ${detail}</li>`;
+        })
+        .join("") +
+      "</ul>";
+  }
+
+  function showToast(message) {
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.style.position = "fixed";
+    toast.style.bottom = "2rem";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.backgroundColor = "#333";
+    toast.style.color = "#fff";
+    toast.style.padding = "0.75rem 1.25rem";
+    toast.style.borderRadius = "8px";
+    toast.style.zIndex = "1000";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
   }
 
   fetchRecentRecords();

@@ -5,11 +5,14 @@ from datetime import datetime, timedelta
 import csv
 from io import StringIO, BytesIO
 import os
+import pytz
 
 app = Flask(__name__)
 
 DATA_DIR = "data"
 DATA_PATH = os.path.join(DATA_DIR, "records.json")
+KST = pytz.timezone("Asia/Seoul")
+
 
 @app.route("/")
 def home():
@@ -56,7 +59,8 @@ def stats_data():
             return jsonify({"error": "Invalid date format"}), 400
     else:
         # 날짜 없으면 최근 30일로 기본 설정
-        end_dt = datetime.today() + timedelta(days=1)
+        now_kst = datetime.now(KST)
+        end_dt = now_kst + timedelta(days=1)
         start_dt = end_dt - timedelta(days=30)
         
     # 3. 파일 불러오기
@@ -68,6 +72,8 @@ def stats_data():
     for r in records:
         try:
             dt = datetime.fromisoformat(r["datetime"])
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=pytz.UTC).astimezone(KST)
         except Exception:
             continue
         if start_dt <= dt < end_dt:
@@ -83,8 +89,8 @@ def stats_data():
     weekly_data = defaultdict(int)
     monthly_summary = defaultdict(lambda: {"푸시업": 0, "스쿼트": 0, "total_reps": 0, "intensity": 0, "calories": 0})
 
-    today = datetime.today()
-
+    today = datetime.now(KST)
+    
     for r in filtered:
         dt = r["_datetime_obj"]
         exercise = r.get("exercise", "")
