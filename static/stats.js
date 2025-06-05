@@ -1,120 +1,150 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  async function loadStats(start = "", end = "") {
-    let url = "/stats-data";
-    if (start && end) {
-      url += `?start=${start}&end=${end}`;
-    }
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    renderStats(data); // 기존 렌더링 로직 묶어두기
-
-    function renderMonthlySummary(summary) {
-      const table = document.getElementById("monthly-table");
-      if (!summary || summary.length === 0) {
-        table.innerHTML = "<p>No data available for selected range.</p>";
-        return;
-      }
-
-      const html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Month</th>
-              <th>Push-ups</th>
-              <th>Squats</th>
-              <th>Total Reps</th>
-              <th>Intensity</th>
-              <th>Calories Burned</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${summary
-              .map(
-                (row) => `
-              <tr>
-                <td>${row.month}</td>
-                <td>${row["푸시업"] || 0}</td>
-                <td>${row["스쿼트"] || 0}</td>
-                <td>${row.total_reps}</td>
-                <td>${row.intensity}</td>
-                <td>${row.calories.toFixed(1)}</td>
-              </tr>
-            `
-              )
-              .join("")}
-          </tbody>
-        </table>
-      `;
-      table.innerHTML = html;
-    }
-    renderMonthlySummary(data.monthly_summary);
+async function loadStats(start = "", end = "") {
+  let url = "/stats-data";
+  if (start && end) {
+    url += `?start=${start}&end=${end}`;
   }
 
-  document.getElementById("filter-btn").addEventListener("click", () => {
-    const start = document.getElementById("start-date").value;
-    const end = document.getElementById("end-date").value;
-    if (start && end) loadStats(start, end);
-  });
+  const res = await fetch(url);
+  const data = await res.json();
 
-  // 초기 호출
-  loadStats();
+  renderWorkoutChart(data.week_labels, data.weekly_durations);
+  renderExerciseChart(data.exercise_labels, data.exercise_counts);
+  renderRecentRecords(data.recent_records);
+  renderMonthlySummary(data.monthly_summary);
+  renderTotalDuration(data.total_duration);
+}
 
-  // 총 운동 시간 계산
-  const totalMinutes = data.total_duration || 0;
-  document.getElementById("total-duration").textContent = `${totalMinutes} min`;
-
-  const totalCount = data.exercise_counts.reduce((a, b) => a + b, 0);
-  document.getElementById("total-count").textContent = totalCount;
-
-  // 선 그래프: 주별 운동량
-  new Chart(document.getElementById("lineChart"), {
+function renderWorkoutChart(labels, data) {
+  const ctx = document.getElementById("workoutChart").getContext("2d");
+  if (window.workoutChart) window.workoutChart.destroy();
+  window.workoutChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: data.week_labels,
+      labels: labels,
       datasets: [
         {
-          label: "Minutes",
-          data: data.weekly_durations,
-          fill: false,
-          borderColor: "#3366ff",
+          label: "Workout Duration (min)",
+          data: data.map((v) => (v / 60).toFixed(1)),
+          borderColor: "#007bff",
+          backgroundColor: "rgba(0,123,255,0.1)",
+          fill: true,
+          tension: 0.2,
         },
       ],
     },
   });
+}
 
-  // 막대 그래프: 운동 종류별 횟수
-  new Chart(document.getElementById("barChart"), {
+function renderExerciseChart(labels, data) {
+  const ctx = document.getElementById("exerciseChart").getContext("2d");
+  if (window.exerciseChart) window.exerciseChart.destroy();
+  window.exerciseChart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels: data.exercise_labels,
+      labels: labels,
       datasets: [
         {
-          label: "Frequency",
-          data: data.exercise_counts,
-          backgroundColor: "#99ccff",
+          label: "Exercise Frequency",
+          data: data,
+          backgroundColor: "#28a745",
         },
       ],
     },
   });
+}
 
-  // 최근 기록 테이블 출력
+function renderRecentRecords(records) {
   const table = document.getElementById("record-table");
-  table.innerHTML =
-    "<table><thead><tr><th>Date</th><th>Type</th><th>Duration</th><th>Reps</th><th>Note</th></tr></thead><tbody>" +
-    data.recent_records
-      .map(
-        (r) => `
-      <tr>
-        <td>${r.datetime?.slice(0, 10) || "-"}</td>
-        <td>${r.exercise}</td>
-        <td>${r.duration || "-"}</td>
-        <td>${r.reps || "-"}</td>
-        <td>${r.note || ""}</td>
-      </tr>
-    `
-      )
-      .join("") +
-    "</tbody></table>";
+  if (!records || records.length === 0) {
+    table.innerHTML = "<p>No recent records.</p>";
+    return;
+  }
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Exercise</th>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${records
+          .map(
+            (r) => `
+          <tr>
+            <td>${r.datetime || "-"}</td>
+            <td>${r.exercise || "-"}</td>
+            <td>${r.reps || "-"}</td>
+            <td>${r.weight || "-"}</td>
+            <td>${r.notes || ""}</td>
+          </tr>
+        `
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
+  table.innerHTML = html;
+}
+
+function renderMonthlySummary(summary) {
+  const table = document.getElementById("monthly-table");
+  if (!summary || summary.length === 0) {
+    table.innerHTML = "<p>No data available for selected range.</p>";
+    return;
+  }
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Push-ups</th>
+          <th>Squats</th>
+          <th>Total Reps</th>
+          <th>Intensity</th>
+          <th>Calories Burned</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${summary
+          .map(
+            (row) => `
+          <tr>
+            <td>${row.month}</td>
+            <td>${row["푸시업"] || 0}</td>
+            <td>${row["스쿼트"] || 0}</td>
+            <td>${row.total_reps}</td>
+            <td>${row.intensity}</td>
+            <td>${row.calories.toFixed(1)}</td>
+          </tr>
+        `
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
+  table.innerHTML = html;
+}
+
+function renderTotalDuration(total) {
+  const minutes = (total / 60).toFixed(1);
+  const box = document.getElementById("total-duration-box");
+  box.innerText = `Total Workout Time: ${minutes} minutes`;
+}
+
+// 날짜 필터 버튼 이벤트
+document.getElementById("filter-btn").addEventListener("click", () => {
+  const start = document.getElementById("start-date").value;
+  const end = document.getElementById("end-date").value;
+  if (start && end) {
+    loadStats(start, end);
+  }
 });
+
+// 초기 로딩
+loadStats();
