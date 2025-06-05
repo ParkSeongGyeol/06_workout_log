@@ -8,7 +8,8 @@ import os
 
 app = Flask(__name__)
 
-DATA_PATH = "data/records.json"
+DATA_DIR = "data"
+DATA_PATH = os.path.join(DATA_DIR, "records.json")
 
 @app.route("/")
 def home():
@@ -108,6 +109,8 @@ def stats_data():
     sorted_weeks = sorted(weekly_data.keys(), key=lambda x: int(x.split()[1]))
     weekly_durations = [weekly_data[w] for w in sorted_weeks]
 
+    total_count = sum(exercise_counter.values())
+
     # 월별 요약 변환
     monthly_summary_list = [
         {"month": k, **v} for k, v in sorted(monthly_summary.items())
@@ -115,6 +118,7 @@ def stats_data():
 
     return jsonify({
         "total_duration": total_duration,
+        "total_count": total_count,
         "week_labels": sorted_weeks,
         "weekly_durations": weekly_durations,
         "exercise_labels": list(exercise_counter.keys()),
@@ -125,7 +129,10 @@ def stats_data():
 
 @app.route("/export-csv")
 def export_csv():
-    with open("data/records.json", "r", encoding="utf-8") as f:
+    if not os.path.exists(DATA_PATH):
+        return "No data", 400
+
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
         records = json.load(f)
 
     # CSV로 변환
@@ -152,6 +159,9 @@ def export_csv():
 @app.route("/save", methods=["POST"])
 def save():
     new_record = request.get_json()
+
+    os.makedirs(DATA_DIR, exist_ok=True)
+
     if not os.path.exists(DATA_PATH):
         with open(DATA_PATH, "w", encoding="utf-8") as f:
             json.dump([], f)
