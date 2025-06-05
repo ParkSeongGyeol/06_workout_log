@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-
   async function loadStats(start = "", end = "") {
     let url = "/stats-data";
     if (start && end) {
@@ -9,7 +8,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch(url);
     const data = await res.json();
 
-    renderStats(data);  // 기존 렌더링 로직 묶어두기
+    renderStats(data); // 기존 렌더링 로직 묶어두기
+
+    function renderMonthlySummary(summary) {
+      const table = document.getElementById("monthly-table");
+      if (!summary || summary.length === 0) {
+        table.innerHTML = "<p>No data available for selected range.</p>";
+        return;
+      }
+
+      const html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Push-ups</th>
+              <th>Squats</th>
+              <th>Total Reps</th>
+              <th>Intensity</th>
+              <th>Calories Burned</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${summary
+              .map(
+                (row) => `
+              <tr>
+                <td>${row.month}</td>
+                <td>${row["푸시업"] || 0}</td>
+                <td>${row["스쿼트"] || 0}</td>
+                <td>${row.total_reps}</td>
+                <td>${row.intensity}</td>
+                <td>${row.calories.toFixed(1)}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
+      table.innerHTML = html;
+    }
+    renderMonthlySummary(data.monthly_summary);
   }
 
   document.getElementById("filter-btn").addEventListener("click", () => {
@@ -20,7 +60,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 초기 호출
   loadStats();
-
 
   // 총 운동 시간 계산
   const totalMinutes = data.total_duration || 0;
@@ -34,13 +73,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     type: "line",
     data: {
       labels: data.week_labels,
-      datasets: [{
-        label: "Minutes",
-        data: data.weekly_durations,
-        fill: false,
-        borderColor: "#3366ff"
-      }]
-    }
+      datasets: [
+        {
+          label: "Minutes",
+          data: data.weekly_durations,
+          fill: false,
+          borderColor: "#3366ff",
+        },
+      ],
+    },
   });
 
   // 막대 그래프: 운동 종류별 횟수
@@ -48,18 +89,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     type: "bar",
     data: {
       labels: data.exercise_labels,
-      datasets: [{
-        label: "Frequency",
-        data: data.exercise_counts,
-        backgroundColor: "#99ccff"
-      }]
-    }
+      datasets: [
+        {
+          label: "Frequency",
+          data: data.exercise_counts,
+          backgroundColor: "#99ccff",
+        },
+      ],
+    },
   });
 
   // 최근 기록 테이블 출력
   const table = document.getElementById("record-table");
-  table.innerHTML = "<table><thead><tr><th>Date</th><th>Type</th><th>Duration</th><th>Reps</th><th>Note</th></tr></thead><tbody>" +
-    data.recent_records.map(r => `
+  table.innerHTML =
+    "<table><thead><tr><th>Date</th><th>Type</th><th>Duration</th><th>Reps</th><th>Note</th></tr></thead><tbody>" +
+    data.recent_records
+      .map(
+        (r) => `
       <tr>
         <td>${r.datetime?.slice(0, 10) || "-"}</td>
         <td>${r.exercise}</td>
@@ -67,5 +113,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${r.reps || "-"}</td>
         <td>${r.note || ""}</td>
       </tr>
-    `).join("") + "</tbody></table>";
+    `
+      )
+      .join("") +
+    "</tbody></table>";
 });
