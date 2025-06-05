@@ -12,24 +12,19 @@ DATA_PATH = "data/records.json"
 def home():
     return render_template("input.html")
 
-
+@app.route("/stats")
+def stats():
+    return render_template("stats.html")
 
 @app.route("/records")
 def get_recent_records():
     if not os.path.exists(DATA_PATH):
         return jsonify([])
-
     with open(DATA_PATH, "r", encoding="utf-8") as f:
         records = json.load(f)
-
     # 최신순으로 20개
     recent = sorted(records, key=lambda x: x.get("datetime", ""), reverse=True)[:20]
     return jsonify(recent)
-
-
-@app.route("/stats")
-def stats():
-    return render_template("stats.html")
 
 @app.route("/stats-data")
 def stats_data():
@@ -50,7 +45,7 @@ def stats_data():
         start_dt = end_dt - timedelta(days=30)
         
     # 3. 파일 불러오기
-    with open("data/records.json", "r", encoding="utf-8") as f:
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
         records = json.load(f)
 
     # 4. 필터링된 레코드만 추출
