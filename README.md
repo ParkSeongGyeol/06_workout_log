@@ -43,8 +43,9 @@ Raspberry Pi 4를 서버로 사용하여 개발한 **운동 기록 웹 애플리
 workout_logger/  
 ├── app.py # Flask 메인 앱  
 ├── templates/  
-│ ├── input.html # 운동 입력 및 기록 확인 페이지  
-│ └── stats.html # 시각화 페이지  
+│ ├── home.html # 대시보드 홈
+│ ├── log.html  # 운동 입력 및 기록 확인 페이지
+│ └── stats.html # 시각화 페이지
 ├── static/  
 │ ├── main.js # 입력 페이지 JS  
 │ ├── stats.js # 시각화 페이지 JS  
