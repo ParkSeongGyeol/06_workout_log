@@ -1,3 +1,4 @@
+// 홈 화면의 동작을 담당하는 스크립트
 document.addEventListener("DOMContentLoaded", () => {
   // 현재 시간을 KST 기준으로 설정
   const now = new Date();

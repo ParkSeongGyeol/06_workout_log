@@ -1,3 +1,4 @@
+// 통계 데이터를 서버에서 받아와 각종 차트를 갱신한다.
 async function loadStats(start = "", end = "") {
   let url = "/stats-data";
   if (start && end) {

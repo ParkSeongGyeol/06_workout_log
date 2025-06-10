@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>운동 영상</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/videos.js" defer></script>
+  </head>
+  <body>
+    <header class="header">
+      <h1>🎥 Videos</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/log">Log</a>
+        <a href="/stats">Stats</a>
+        <a href="/videos">Videos</a>
+      </nav>
+    </header>
+    <main class="container">
+      <section class="card">
+        <h2>영상 업로드 / 추가</h2>
+        <form id="video-form" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>운동 종류</label>
+            <input type="text" name="exercise" required />
+          </div>
+          <div class="form-group">
+            <label>제목</label>
+            <input type="text" name="title" required />
+          </div>
+          <div class="form-group">
+            <label>YouTube 링크 (선택)</label>
+            <input type="url" name="youtube_url" />
+          </div>
+          <div class="form-group">
+            <label>비디오 파일 (선택)</label>
+            <input type="file" name="video_file" accept="video/*" />
+          </div>
+          <button type="submit" class="submit-btn">저장</button>
+        </form>
+      </section>
+      <section class="records">
+        <h2>영상 목록</h2>
+        <div id="video-table"></div>
+      </section>
+    </main>
+  </body>
+</html>
