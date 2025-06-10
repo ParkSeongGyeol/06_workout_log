@@ -7,6 +7,7 @@
 let allVideos = [];
 
 // 페이지 로드 후 영상 목록을 받아오고 업로드 폼 이벤트를 연결
+
 document.addEventListener("DOMContentLoaded", () => {
   fetchVideos();
   document.getElementById("video-form").addEventListener("submit", uploadVideo);
@@ -157,7 +158,7 @@ function downloadSelected() {
   window.location.href = `/download-video/${v.path}`;
 }
 
-// 유튜브 링크에서 ID 추출
+
 // 유튜브 주소에서 동영상 ID를 추출
 function extractYoutubeID(url) {
   const match = url.match(/v=([^&]+)/);
