@@ -1,3 +1,9 @@
+// ------------------------------------------------------------
+// stats.js
+// 통계 페이지의 각종 차트 렌더링 및 필터링을 담당한다.
+// 서버에서 데이터(JSON)를 받아 Chart.js 그래프와 표를 갱신한다.
+// ------------------------------------------------------------
+// 통계 데이터를 서버에서 받아와 각종 차트를 갱신한다.
 async function loadStats(start = "", end = "") {
   let url = "/stats-data";
   if (start && end) {
@@ -21,6 +27,7 @@ async function loadStats(start = "", end = "") {
   );
 }
 
+// 주간 운동 시간 추이를 선 그래프로 표시
 function renderWorkoutChart(labels, data) {
   const canvas = document.getElementById("lineChart");
   if (!canvas) return;
@@ -44,6 +51,7 @@ function renderWorkoutChart(labels, data) {
   });
 }
 
+// 운동 종류별 수행 횟수를 막대그래프로 표시
 function renderExerciseChart(labels, data) {
   const canvas = document.getElementById("barChart");
   if (!canvas) return;
@@ -116,12 +124,14 @@ function renderTotalCount(count) {
   el.textContent = count;
 }
 
+// 반복 수에 따른 강도 레벨과 색상을 계산
 function getIntensityLevel(intensity) {
   if (intensity < 100) return { level: "Low", color: "green" };
   if (intensity < 200) return { level: "Moderate", color: "orange" };
   return { level: "High", color: "red" };
 }
 
+// 월별 요약 표를 만들어 화면에 삽입
 function renderMonthlySummary(summary) {
   const table = document.getElementById("monthly-table");
   if (!summary || summary.length === 0) {
@@ -176,6 +186,7 @@ document.getElementById("filter-btn").addEventListener("click", () => {
 
 let repsChart, ratioChart;
 
+// 월별 반복 수 변화와 운동 비율을 보여 주는 추가 차트들 렌더링
 function renderExtraCharts(monthlyData, exerciseCounts, exerciseLabels) {
   const ctx1 = document.getElementById("monthlyRepsChart").getContext("2d");
   const ctx2 = document.getElementById("exerciseRatioChart").getContext("2d");

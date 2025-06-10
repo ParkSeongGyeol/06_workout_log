@@ -1,3 +1,4 @@
+// CSV 내보내기 버튼 처리
 document.getElementById("export-csv-btn").addEventListener("click", () => {
   fetch("/export-csv")
     .then((response) => response.blob())
