@@ -89,8 +89,11 @@ def stats_data():
         start_dt = end_dt - timedelta(days=30)
         
     # 3. 파일 불러오기
-    with open(DATA_PATH, "r", encoding="utf-8") as f:
-        records = json.load(f)
+    if not os.path.exists(DATA_PATH):
+        records = []
+    else:
+        with open(DATA_PATH, "r", encoding="utf-8") as f:
+            records = json.load(f)
 
     # 4. 필터링된 레코드만 추출
     filtered = []
