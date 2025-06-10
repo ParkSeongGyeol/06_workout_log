@@ -89,12 +89,26 @@ async function uploadVideo(e) {
   e.preventDefault();
   const form = e.target;
   const formData = new FormData(form);
-  await fetch("/add-video", {
-    method: "POST",
-    body: formData,
+  const progress = document.getElementById("upload-progress");
+  progress.style.display = "block";
+  progress.value = 0;
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/add-video");
+  xhr.upload.addEventListener("progress", (evt) => {
+    if (evt.lengthComputable) {
+      progress.value = (evt.loaded / evt.total) * 100;
+    }
   });
-  form.reset();
-  fetchVideos();
+  xhr.onload = () => {
+    progress.style.display = "none";
+    form.reset();
+    fetchVideos();
+  };
+  xhr.onerror = () => {
+    progress.style.display = "none";
+    alert("Upload failed");
+  };
+  xhr.send(formData);
 }
 
 // 체크된 영상 삭제 요청
@@ -165,5 +179,9 @@ function extractYoutubeID(url) {
   return match ? match[1] : url;
 }
 
-window.addEventListener("resize", renderTable);
-// 화면 크기가 바뀌면 테이블을 다시 그려 모바일 레이아웃을 유지
+window.addEventListener("resize", () => {
+  if (!document.fullscreenElement) {
+    renderTable();
+  }
+});
+// 화면 크기가 바뀌면 테이블을 다시 그리되 전체화면 시에는 동작하지 않음
