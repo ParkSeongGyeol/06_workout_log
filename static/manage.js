@@ -1,17 +1,25 @@
-// 관리 페이지에서 기록을 조회/수정/삭제하는 스크립트
-// 화면 크기에 따라 테이블 형태를 변경하며, 체크박스로 선택된
-// 항목에 대해 일괄 편집 또는 삭제를 수행한다.
+// ------------------------------------------------------------
+// manage.js
+// "Log" 페이지 전용 스크립트
+// 서버에 저장된 모든 운동 기록을 읽어와 목록을 그리고,
+// 선택된 항목을 일괄 수정/삭제할 수 있게 한다.
+// 화면 크기에 따라 테이블 형태가 달라지며 모바일에서는
+// 필요한 정보만 축약하여 보여 준다.
+// ------------------------------------------------------------
 
 let allRecords = [];
 
 // 페이지 로드 시 데이터 조회
+// DOM이 준비되면 서버에서 데이터를 읽어 와 테이블을 그리고
+// 윈도우 크기가 변할 때마다 화면을 다시 그린다.
 document.addEventListener("DOMContentLoaded", () => {
   fetchRecords();
-  // 화면 크기가 변경되면 테이블을 다시 그린다.
   window.addEventListener("resize", renderTable);
 });
 
-// 서버에서 모든 기록을 받아 온다.
+// -----------------------------------------------
+// 서버에서 모든 기록을 받아와 allRecords 배열에 저장
+// -----------------------------------------------
 async function fetchRecords() {
   const res = await fetch("/all-records");
   const data = await res.json();
@@ -21,7 +29,10 @@ async function fetchRecords() {
   renderTable();
 }
 
+// -----------------------------------------------
 // 현재 화면 크기에 맞춰 테이블을 렌더링한다.
+// 모바일과 데스크톱 레이아웃을 동시에 지원한다.
+// -----------------------------------------------
 function renderTable() {
   const container = document.getElementById("record-table");
   if (!allRecords.length) {
@@ -80,14 +91,19 @@ function renderTable() {
   document.getElementById("delete-btn").addEventListener("click", deleteSelected);
 }
 
-// 선택된 체크박스의 인덱스 배열을 반환
+// ------------------------------------------------------
+// 현재 체크된 레코드의 인덱스 배열을 반환한다.
+// 테이블 행의 data-index 속성을 이용한다.
+// ------------------------------------------------------
 function getSelectedIndices() {
   return Array.from(document.querySelectorAll(".select-box:checked")).map((c) =>
     Number(c.dataset.index)
   );
 }
 
-// 선택된 기록 삭제
+// ------------------------------------------------------
+// 선택된 기록들을 서버에 삭제 요청 후 목록을 새로 고침
+// ------------------------------------------------------
 function deleteSelected() {
   const indices = getSelectedIndices();
   if (!indices.length) {
@@ -107,7 +123,9 @@ function deleteSelected() {
   ).then(fetchRecords);
 }
 
-// 선택된 기록 편집 (한 개만 가능)
+// ------------------------------------------------------
+// 체크된 행이 하나일 때 해당 기록을 간단한 프롬프트로 수정
+// ------------------------------------------------------
 function editSelected() {
   const indices = getSelectedIndices();
   if (indices.length !== 1) {
@@ -148,4 +166,6 @@ function editSelected() {
     body: JSON.stringify(data),
   }).then(fetchRecords);
 }
+
+// 초기 데이터 로딩을 바로 수행
 

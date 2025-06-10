@@ -1,6 +1,16 @@
-// 홈 화면의 동작을 담당하는 스크립트
+// ------------------------------------------------------------
+// main.js
+// 홈 페이지에서 운동 기록을 작성하고 최근 기록을 보여 주는 스크립트
+// 각 함수와 이벤트 처리 부분마다 한국어 주석을 달아 초심자도
+// 동작 흐름을 쉽게 파악할 수 있도록 한다.
+// ------------------------------------------------------------
+// DOM 로딩이 끝난 뒤 실행되는 초기화 함수
+
 document.addEventListener("DOMContentLoaded", () => {
-  // 현재 시간을 KST 기준으로 설정
+  // ------------------------------------------------------
+  // 현재 시각을 한국 표준시(KST) 기준 ISO 문자열로 변환하여
+  // datetime-local 입력 필드의 기본값으로 사용한다.
+  // ------------------------------------------------------
   const now = new Date();
   const offsetMs = now.getTimezoneOffset() * 60000;
   const kstNow = new Date(now.getTime() - offsetMs);
@@ -11,7 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const dynamicInputs = document.getElementById("dynamic-inputs");
   const form = document.getElementById("exercise-form");
 
-  // 운동 종류별 입력 필드 렌더링
+  // ------------------------------------------------------
+  // 운동 종류 선택 시 필요한 입력 항목을 동적으로 표시한다.
+  // 예) 푸시업/스쿼트/런지 -> Reps 입력필드
+  //     플랭크 -> Duration 입력필드
+  //     런지 -> Direction 선택 필드
+  // ------------------------------------------------------
   exerciseSelect.addEventListener("change", () => {
     const selected = exerciseSelect.value;
     dynamicInputs.innerHTML = "";
@@ -45,7 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 저장 처리
+  // ------------------------------------------------------
+  // 폼 제출 시 서버로 기록을 전송하고 최근 목록을 다시 읽어 온다.
+  // ------------------------------------------------------
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
@@ -94,7 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchRecentRecords();
   });
 
-  // 최근 기록 불러오기
+  // -----------------------------------------
+  // 최근 기록 목록을 서버에서 받아 화면에 표시
+  // -----------------------------------------
   async function fetchRecentRecords() {
     const res = await fetch("/records");
     const records = await res.json();
@@ -114,6 +133,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "</ul>";
   }
 
+  // -----------------------------------------
+  // 간단한 토스트 메시지 표시용 유틸리티
+  // -----------------------------------------
   function showToast(message) {
     const toast = document.createElement("div");
     toast.textContent = message;

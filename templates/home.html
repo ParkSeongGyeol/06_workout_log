@@ -1,4 +1,8 @@
 <!doctype html>
+<!--
+  Home 페이지
+  운동 기록을 입력하고 최근 기록을 한눈에 볼 수 있는 메인 화면
+-->
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -47,6 +51,7 @@
   </head>
   <body>
     <header class="header">
+      <!-- 상단 네비게이션 메뉴 -->
       <h1>🏠 Home</h1>
       <nav>
         <a href="/">Home</a>
@@ -57,6 +62,7 @@
     </header>
     <main class="container">
       <section class="card">
+        <!-- 운동 기록 입력 폼 -->
         <form id="exercise-form">
           <div class="form-group">
             <label>Workout Type</label>
@@ -94,6 +100,7 @@
       </section>
 
       <section class="records">
+        <!-- 서버에서 불러온 최근 기록 목록 -->
         <h2>Recent Workouts</h2>
         <div id="recent-records"></div>
       </section>

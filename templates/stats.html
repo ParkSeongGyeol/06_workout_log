@@ -1,4 +1,8 @@
 <!doctype html>
+<!--
+  Stats 페이지
+  기간별 운동 통계와 차트를 확인할 수 있는 화면
+-->
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -45,6 +49,7 @@
   <body>
     <header class="header">
       <h1>📊 Stats</h1>
+      <!-- 페이지 이동용 네비게이션 -->
       <nav>
         <a href="/">Home</a>
         <a href="/log">Log</a>
@@ -55,6 +60,7 @@
     <main class="container">
       <!-- 날짜 입력 카드 -->
       <section class="filter-box card">
+        <!-- 기간 필터 입력 -->
         <h2>Filter by Date</h2>
         <label
           >Start Date:
@@ -88,12 +94,14 @@
 
       <!-- 기록 테이블 -->
       <section class="records">
+        <!-- 필터링된 최근 운동 목록 -->
         <h2>Recent Workouts</h2>
         <div id="record-table"></div>
       </section>
 
       <!-- 차트 데이터 -->
       <section class="monthly-summary records">
+        <!-- 월별 요약 표 -->
         <h2>Monthly Summary</h2>
         <div id="monthly-table"></div>
       </section>

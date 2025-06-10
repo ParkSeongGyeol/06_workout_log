@@ -1,3 +1,9 @@
+/* ----------------------------------------------------------
+   style.css
+   모든 페이지에서 공통으로 사용하는 기본 스타일 정의
+   각 섹션의 주석을 참고하여 커스터마이징 가능
+   ---------------------------------------------------------- */
+
 body {
   font-family: "Segoe UI", sans-serif;
   margin: 0;
@@ -6,6 +12,7 @@ body {
   color: #333;
 }
 
+/* 상단 네비게이션 영역 */
 .header {
   background-color: white;
   padding: 1rem 2rem;
@@ -31,12 +38,14 @@ h2 {
   margin: 0 0 1rem 0;
 }
 
+/* 페이지 본문 영역 크기 제한 */
 .container {
   max-width: 800px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
+/* 일반 섹션을 카드 형태로 표시 */
 .card {
   background-color: white;
   padding: 2rem;
@@ -117,6 +126,7 @@ textarea {
   margin-bottom: 0.5rem;
 }
 
+/* 768px 이하 화면에서 적용되는 레이아웃 조정 */
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
@@ -214,6 +224,7 @@ th {
   background-color: #234bcc;
 }
 
+/* 480px 이하의 작은 화면 최적화 */
 @media (max-width: 480px) {
   .header {
     flex-direction: column;

@@ -53,7 +53,7 @@
 ## 🚀 실행 방법
 1. 의존 패키지 설치
    ```bash
-   pip install flask pytz
+   pip install -r requirements.txt
    ```
 2. 서버 실행
    ```bash
@@ -67,3 +67,56 @@
 - `data/records.json` 과 `data/uploads/` 폴더는 `.gitignore`에 포함되어 있어 버전 관리에서 제외됩니다.
 - 서버를 중단 없이 실행하려면 Flask 외에 production WSGI 서버(gunicorn 등)를 사용할 수 있습니다.
 
+---
+
+## 🆕 새 환경에서 시작하기
+
+처음 프로젝트를 클론한 뒤 다음 순서대로 준비하면 됩니다.
+
+### 1. 가상 환경 및 패키지 설치
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows는 venv\Scripts\activate
+pip install -r requirements.txt
+```
+또는 위 과정을 자동화한 `setup.sh` 스크립트를 실행할 수도 있습니다.
+
+```bash
+./setup.sh
+```
+
+### 2. 데이터 파일 구성
+
+프로젝트에는 기본 데이터가 포함되어 있지 않으므로 `data/` 폴더에 빈 파일을 생성합니다.
+`setup.sh`를 사용했다면 이 과정은 자동으로 완료됩니다.
+
+```bash
+mkdir -p data/uploads
+echo "[]" > data/records.json
+echo "[]" > data/videos.json
+```
+
+### 3. 동작 확인 및 테스트
+
+파이썬 문법 오류가 없는지 확인 후 서버를 실행합니다.
+
+```bash
+python -m py_compile app.py
+python app.py
+```
+
+### 4. 시연 방법
+
+브라우저에서 `http://localhost:5000` 에 접속하면 홈 화면이 표시됩니다. 이후 상단 메뉴를 통해 `Log`, `Stats`, `Videos` 페이지를 오가며 기능을 확인할 수 있습니다.
+
+
+---
+
+## 📈 다음 할 일
+
+앞으로 개선하거나 시도해 볼 만한 아이디어를 간단히 정리합니다.
+
+- 사용자 계정을 도입하여 여러 사람이 기록을 분리해서 관리
+- 운동 종류와 영상 카테고리 추가 및 검색 기능 강화
+- Docker 등을 활용한 배포 자동화 스크립트 작성

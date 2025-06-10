@@ -1,4 +1,8 @@
 <!doctype html>
+<!--
+  Log 페이지
+  저장된 모든 운동 기록을 조회하고 선택 편집/삭제를 수행
+-->
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -33,6 +37,7 @@
   <body>
     <header class="header">
       <h1>📃 Log</h1>
+      <!-- 사이트 이동을 위한 네비게이션 -->
       <nav>
         <a href="/">Home</a>
         <a href="/log">Log</a>
@@ -43,6 +48,7 @@
 
     <main class="container">
       <section class="records">
+        <!-- 체크박스로 여러 기록을 선택해 편집/삭제 -->
         <h2>All Records</h2>
         <div id="record-table"></div>
       </section>

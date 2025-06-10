@@ -1,4 +1,8 @@
 <!doctype html>
+<!--
+  Videos 페이지
+  운동 영상을 업로드하거나 유튜브 링크를 관리하는 화면
+-->
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -10,6 +14,7 @@
   <body>
     <header class="header">
       <h1>🎥 Videos</h1>
+      <!-- 다른 페이지로 이동하기 위한 메뉴 -->
       <nav>
         <a href="/">Home</a>
         <a href="/log">Log</a>
@@ -20,6 +25,7 @@
     <main class="container">
       <section class="card">
         <h2>영상 업로드 / 추가</h2>
+        <!-- 영상 업로드/링크 등록 폼 -->
         <form id="video-form" enctype="multipart/form-data">
           <div class="form-group">
             <label>운동 종류</label>
@@ -41,6 +47,7 @@
         </form>
       </section>
       <section class="records">
+        <!-- 등록된 영상 목록 -->
         <h2>영상 목록</h2>
         <div id="video-table"></div>
       </section>

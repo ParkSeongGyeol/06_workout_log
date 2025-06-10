@@ -1,7 +1,12 @@
-// 영상 관리 페이지 전용 스크립트
-// 영상 목록 조회/업로드/수정/삭제 등을 처리한다.
+// ------------------------------------------------------------
+// videos.js
+// 영상 관리 페이지 전용 스크립트로 영상 목록을 불러오고
+// 업로드, 수정, 삭제, 다운로드 기능을 제공한다.
+// ------------------------------------------------------------
 
 let allVideos = [];
+
+// 페이지 로드 후 영상 목록을 받아오고 업로드 폼 이벤트를 연결
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchVideos();
@@ -9,12 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // 서버에서 영상 목록을 불러와 테이블을 렌더링
+// 영상 메타데이터를 서버로부터 가져와 테이블을 그린다
 async function fetchVideos() {
   const res = await fetch("/video-data");
   allVideos = await res.json();
   renderTable();
 }
 
+// 화면 크기에 맞춰 영상 목록 테이블을 생성
 function renderTable() {
   const container = document.getElementById("video-table");
   if (!allVideos.length) {
@@ -70,13 +77,14 @@ function renderTable() {
   document.getElementById("download-btn").addEventListener("click", downloadSelected);
 }
 
+// 체크된 영상들의 인덱스 배열 반환
 function getSelectedIndices() {
   return Array.from(document.querySelectorAll(".select-box:checked")).map((c) =>
     Number(c.dataset.index)
   );
 }
 
-// 영상 업로드
+// 업로드 폼 제출 시 호출되어 서버에 영상을 등록
 async function uploadVideo(e) {
   e.preventDefault();
   const form = e.target;
@@ -89,7 +97,7 @@ async function uploadVideo(e) {
   fetchVideos();
 }
 
-// 선택된 영상 삭제
+// 체크된 영상 삭제 요청
 function deleteSelected() {
   const indices = getSelectedIndices();
   if (!indices.length) {
@@ -108,7 +116,7 @@ function deleteSelected() {
   ).then(fetchVideos);
 }
 
-// 선택된 영상 정보 수정 (첫 번째만)
+// 첫 번째로 선택된 영상의 정보를 프롬프트로 수정
 function editSelected() {
   const indices = getSelectedIndices();
   if (indices.length !== 1) {
@@ -134,7 +142,7 @@ function editSelected() {
   }).then(fetchVideos);
 }
 
-// 선택된 영상 다운로드 (로컬 파일만)
+// 로컬 파일일 경우 선택된 영상 다운로드
 function downloadSelected() {
   const indices = getSelectedIndices();
   if (indices.length !== 1) {
@@ -150,10 +158,12 @@ function downloadSelected() {
   window.location.href = `/download-video/${v.path}`;
 }
 
-// 유튜브 링크에서 ID 추출
+
+// 유튜브 주소에서 동영상 ID를 추출
 function extractYoutubeID(url) {
   const match = url.match(/v=([^&]+)/);
   return match ? match[1] : url;
 }
 
 window.addEventListener("resize", renderTable);
+// 화면 크기가 바뀌면 테이블을 다시 그려 모바일 레이아웃을 유지
